@@ -1,7 +1,6 @@
 FROM redis:5.0.4
 MAINTAINER shaobo.zheng <shaobo.zheng@xuncetech.com>
 ENV DEBIAN_FRONTEND noninteractive
-ADD redis-trib.rb /usr/local/bin/redis-trib.rb
 ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN apt-get -y update \
   && apt-get -y upgrade \
