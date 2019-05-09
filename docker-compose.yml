@@ -1,0 +1,126 @@
+version: "3"
+
+networks:
+  redis-jq:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+
+services:
+  redis-slave1:
+    build: ./slave1
+    image: redis-slave1:latest
+    restart: always
+    container_name: redis-slave1
+    ports:
+      - 6380:6380
+      - 16380:16380
+    volumes:
+      - ./slave1/data:/data
+    privileged: true
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.2
+
+  redis-slave2:
+    build: ./slave2
+    image: redis-slave2:latest
+    restart: always
+    container_name: redis-slave2
+    ports:
+      - 6381:6381
+      - 16381:16381
+    volumes:
+      - ./slave2/data:/data
+    privileged: true
+    depends_on:
+      - redis-slave1
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.3
+
+  redis-slave3:
+    build: ./slave3
+    image: redis-slave3:latest
+    restart: always
+    container_name: redis-slave3
+    ports:
+      - 6382:6382
+      - 16382:16382
+    volumes:
+      - ./slave3/data:/data
+    privileged: true
+    depends_on:
+      - redis-slave2
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.4
+
+  redis-slave4:
+    build: ./slave4
+    image: redis-slave4:latest
+    restart: always
+    container_name: redis-slave4
+    ports:
+      - 6383:6383
+      - 16383:16383
+    volumes:
+      - ./slave4/data:/data
+    privileged: true
+    depends_on:
+      - redis-slave3
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.5
+
+  redis-slave5:
+    build: ./slave5
+    image: redis-slave5:latest
+    restart: always
+    container_name: redis-slave5
+    ports:
+      - 6384:6384
+      - 16384:16384
+    volumes:
+      - ./slave5/data:/data
+    privileged: true
+    depends_on:
+      - redis-slave4
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.6
+
+  redis-slave6:
+    build: ./slave6
+    image: redis-slave6:latest
+    restart: always
+    container_name: redis-slave6
+    ports:
+      - 6385:6385
+      - 16385:16385
+    volumes:
+      - ./slave6/data:/data
+    privileged: true
+    depends_on:
+      - redis-slave5
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.7
+
+  redis-ruby:
+    build: ./ruby
+    image: ruby:xunce
+    container_name: redis-ruby
+    environment:
+      - ADDRD=192.168.100.2:6380 192.168.100.3:6381 192.168.100.4:6382 192.168.100.5:6383 192.168.100.6:6384 192.168.100.7:6385
+    depends_on:
+      - redis-slave1
+      - redis-slave2
+      - redis-slave3
+      - redis-slave4
+      - redis-slave5
+      - redis-slave6
+    networks:
+      redis-jq:
+        ipv4_address: 192.168.100.100
